@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/stormasm/go-elastic/mytest"
+	"github.com/stormasm/elastic-examples/mytest"
 )
 
 func main() {
-	mytest.Example()
+	mytest.ExampleBodyString()
 }
