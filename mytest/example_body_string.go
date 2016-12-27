@@ -24,25 +24,6 @@ func ExampleBodyString() {
 		panic(err)
 	}
 
-	// Trace request and response details like this
-	//client.SetTracer(log.New(os.Stdout, "", 0))
-
-	// Ping the Elasticsearch server to get e.g. the version number
-	info, code, err := client.Ping("http://127.0.0.1:9200").Do(context.Background())
-	if err != nil {
-		// Handle error
-		panic(err)
-	}
-	fmt.Printf("Elasticsearch returned with code %d and version %s", code, info.Version.Number)
-
-	// Getting the ES version number is quite common, so there's a shortcut
-	esversion, err := client.ElasticsearchVersion("http://127.0.0.1:9200")
-	if err != nil {
-		// Handle error
-		panic(err)
-	}
-	fmt.Printf("Elasticsearch version %s", esversion)
-
 	// Use the IndexExists service to check if a specified index exists.
 	exists, err := client.IndexExists("twitter").Do(context.Background())
 	if err != nil {
@@ -61,46 +42,85 @@ func ExampleBodyString() {
 		}
 	}
 
-	// Index a tweet (using JSON serialization)
-	tweet1 := Tweet{User: "olivere", Message: "Take Five", Retweets: 0}
+	tweet1 := `{"user" : "olivere", "town" : "Pittsburgh", "message" : "It's a Good Life"}`
 	put1, err := client.Index().
 		Index("twitter").
 		Type("tweet").
-		Id("1").
-		BodyJson(tweet1).
+		Id("10").
+		BodyString(tweet1).
 		Do(context.Background())
 	if err != nil {
 		// Handle error
 		panic(err)
 	}
-	fmt.Printf("Indexed tweet %s to index %s, type %s\n", put1.Id, put1.Index, put1.Type)
+	fmt.Printf("Indexed tweet %s \n", put1.Id)
 
-	// Index a second tweet (by string)
-	tweet2 := `{"user" : "olivere", "message" : "It's a Raggy Waltz"}`
+	tweet2 := `{"user" : "smith", "message" : "It's a Raggy Waltz"}`
 	put2, err := client.Index().
 		Index("twitter").
 		Type("tweet").
-		Id("2").
+		Id("20").
 		BodyString(tweet2).
 		Do(context.Background())
 	if err != nil {
 		// Handle error
 		panic(err)
 	}
-	fmt.Printf("Indexed tweet %s to index %s, type %s\n", put2.Id, put2.Index, put2.Type)
+	fmt.Printf("Indexed tweet %s \n", put2.Id)
+
+	tweet3 := `{"user" : "cohn", "party" : "temporary"}`
+	put3, err := client.Index().
+		Index("twitter").
+		Type("tweet").
+		Id("30").
+		BodyString(tweet3).
+		Do(context.Background())
+	if err != nil {
+		// Handle error
+		panic(err)
+	}
+	fmt.Printf("Indexed tweet %s \n", put3.Id)
 
 	// Get tweet with specified ID
 	get1, err := client.Get().
 		Index("twitter").
 		Type("tweet").
-		Id("1").
+		Id("10").
 		Do(context.Background())
 	if err != nil {
 		// Handle error
 		panic(err)
 	}
 	if get1.Found {
-		fmt.Printf("Got document %s in version %d from index %s, type %s\n", get1.Id, get1.Version, get1.Index, get1.Type)
+		fmt.Printf("Got document %s \n", get1.Id)
+	}
+
+	// Get tweet with specified ID
+	get2, err := client.Get().
+		Index("twitter").
+		Type("tweet").
+		Id("20").
+		Do(context.Background())
+	if err != nil {
+		// Handle error
+		panic(err)
+	}
+	if get2.Found {
+		fmt.Printf("Got document %s \n", get2.Id)
+	}
+
+	// Get tweet with specified ID
+	get3, err := client.Get().
+		Index("twitter").
+		Type("tweet").
+		Id("30").
+		Do(context.Background())
+	if err != nil {
+		// Handle error
+		panic(err)
+	}
+	if get3.Found {
+		fmt.Printf("Got document %s \n", get3.Id)
 	}
 
 	// Flush to make sure the documents got written.
