@@ -15,10 +15,20 @@ import (
 )
 
 func ExampleBodyString() {
-	errorlog := log.New(os.Stdout, "APP ", log.LstdFlags)
+
+	// This works for TestExists
+	// client := setupTestClientAndCreateIndexAndAddDocs(t, SetTraceLog(log.New(os.Stdout, "", 0)))
 
 	// Obtain a client. You can also provide your own HTTP client here.
-	client, err := elastic.NewClient(elastic.SetErrorLog(errorlog))
+
+	// This is the default way
+	// errorlog := log.New(os.Stdout, "APP ", log.LstdFlags)
+	// client, err := elastic.NewClient(elastic.SetErrorLog(errorlog))
+
+	// Do a trace log
+	tracelog := log.New(os.Stdout, "", 0)
+	client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
+
 	if err != nil {
 		// Handle error
 		panic(err)
