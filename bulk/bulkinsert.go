@@ -29,7 +29,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
+	//"os"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -68,8 +68,10 @@ func main() {
 	}
 
 	// Do a trace log
-	tracelog := log.New(os.Stdout, "", 0)
-	client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
+	// tracelog := log.New(os.Stdout, "", 0)
+	// client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
+	// Or with nothing...
+	client, err := elastic.NewClient()
 
 	if err != nil {
 		// Handle error
@@ -83,7 +85,7 @@ func main() {
 	// via the docsc channel.
 	// The second Goroutine will simply bulk insert the documents.
 	type doc struct {
-		ID        string    `json:"id"`
+		ID string `json:"id"`
 	}
 	docsc := make(chan doc)
 
@@ -99,7 +101,7 @@ func main() {
 
 			// Construct the document
 			d := doc{
-				ID:        myid,
+				ID: myid,
 			}
 
 			// Send over to 2nd goroutine, or cancel
