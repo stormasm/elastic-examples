@@ -24,13 +24,13 @@
 package main
 
 import (
-	"encoding/base64"
 	"errors"
 	"flag"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
+	"strconv"
 	"sync/atomic"
 	"time"
 
@@ -84,7 +84,6 @@ func main() {
 	// The second Goroutine will simply bulk insert the documents.
 	type doc struct {
 		ID        string    `json:"id"`
-		Timestamp time.Time `json:"@timestamp"`
 	}
 	docsc := make(chan doc)
 
@@ -94,19 +93,13 @@ func main() {
 	g.Go(func() error {
 		defer close(docsc)
 
-		buf := make([]byte, 32)
 		for i := 0; i < *n; i++ {
-			// Generate a random ID
-			_, err := rand.Read(buf)
-			if err != nil {
-				return err
-			}
-			id := base64.URLEncoding.EncodeToString(buf)
+
+			myid := strconv.Itoa(i)
 
 			// Construct the document
 			d := doc{
-				ID:        id,
-				Timestamp: time.Now(),
+				ID:        myid,
 			}
 
 			// Send over to 2nd goroutine, or cancel
