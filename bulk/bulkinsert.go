@@ -26,12 +26,12 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
+	//"fmt"
 	"log"
 	"math/rand"
 	//"os"
 	"strconv"
-	"sync/atomic"
+	//"sync/atomic"
 	"time"
 
 	"golang.org/x/net/context"
@@ -41,7 +41,6 @@ import (
 
 func main() {
 	var (
-		url      = flag.String("url", "http://localhost:9200", "Elasticsearch URL")
 		index    = flag.String("index", "", "Elasticsearch index name")
 		typ      = flag.String("type", "", "Elasticsearch type name")
 		n        = flag.Int("n", 0, "Number of documents to bulk insert")
@@ -51,9 +50,6 @@ func main() {
 	log.SetFlags(0)
 	rand.Seed(time.Now().UnixNano())
 
-	if *url == "" {
-		log.Fatal("missing url parameter")
-	}
 	if *index == "" {
 		log.Fatal("missing index parameter")
 	}
@@ -89,8 +85,6 @@ func main() {
 	}
 	docsc := make(chan doc)
 
-	begin := time.Now()
-
 	// Goroutine to create documents
 	g.Go(func() error {
 		defer close(docsc)
@@ -115,17 +109,9 @@ func main() {
 	})
 
 	// Second goroutine will consume the documents sent from the first and bulk insert into ES
-	var total uint64
 	g.Go(func() error {
 		bulk := client.Bulk().Index(*index).Type(*typ)
 		for d := range docsc {
-			// Simple progress
-			current := atomic.AddUint64(&total, 1)
-			dur := time.Since(begin).Seconds()
-			sec := int(dur)
-			pps := int64(float64(current) / dur)
-			fmt.Printf("%10d | %6d req/s | %02d:%02d\r", current, pps, sec/60, sec%60)
-
 			// Enqueue the document
 			bulk.Add(elastic.NewBulkIndexRequest().Id(d.ID).Doc(d))
 			if bulk.NumberOfActions() >= *bulkSize {
@@ -162,10 +148,4 @@ func main() {
 	if err := g.Wait(); err != nil {
 		log.Fatal(err)
 	}
-
-	// Final results
-	dur := time.Since(begin).Seconds()
-	sec := int(dur)
-	pps := int64(float64(total) / dur)
-	fmt.Printf("%10d | %6d req/s | %02d:%02d\n", total, pps, sec/60, sec%60)
 }
