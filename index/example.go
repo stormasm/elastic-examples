@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-license.
 // See http://olivere.mit-license.org/license.txt for details.
 
-package mytest
+package index
 
 import (
 	"encoding/json"
