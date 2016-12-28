@@ -30,6 +30,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync/atomic"
 	"time"
 
@@ -43,7 +44,6 @@ func main() {
 		url      = flag.String("url", "http://localhost:9200", "Elasticsearch URL")
 		index    = flag.String("index", "", "Elasticsearch index name")
 		typ      = flag.String("type", "", "Elasticsearch type name")
-		sniff    = flag.Bool("sniff", true, "Enable or disable sniffing")
 		n        = flag.Int("n", 0, "Number of documents to bulk insert")
 		bulkSize = flag.Int("bulk-size", 0, "Number of documents to collect before committing")
 	)
@@ -67,9 +67,12 @@ func main() {
 		log.Fatal("bulk-size must be a positive number")
 	}
 
-	// Create an Elasticsearch client
-	client, err := elastic.NewClient(elastic.SetURL(*url), elastic.SetSniff(*sniff))
+	// Do a trace log
+	tracelog := log.New(os.Stdout, "", 0)
+	client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
+
 	if err != nil {
+		// Handle error
 		log.Fatal(err)
 	}
 
