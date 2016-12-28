@@ -29,7 +29,7 @@ import (
 	//"fmt"
 	"log"
 	"math/rand"
-	//"os"
+	"os"
 	"strconv"
 	//"sync/atomic"
 	"time"
@@ -64,10 +64,10 @@ func main() {
 	}
 
 	// Do a trace log
-	// tracelog := log.New(os.Stdout, "", 0)
-	// client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
+	tracelog := log.New(os.Stdout, "", 0)
+	client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
 	// Or with nothing...
-	client, err := elastic.NewClient()
+	// client, err := elastic.NewClient()
 
 	if err != nil {
 		// Handle error
