@@ -21,40 +21,19 @@ import (
 )
 
 func main() {
-
+	done := make(chan bool)
 	url := "http://127.0.0.1:3000/omdb.json"
 	json := getJson(url)
 	fmt.Println(len(json))
 	doc_chan := getChannel(json)
-
+	//done <- true
 	fmt.Println("Channel length ",len(doc_chan))
-/*
-	count := 0
-	for d := range doc_chan {
-		fmt.Println(count, " ", d)
-		count = count + 1
-	}
-*/
-	// wait until the channel is full before proceeding...
-
-	done := make(chan bool, 1)
-	go worker(done)
-	<-done
-	fmt.Println("Channel length ",len(doc_chan))
-	processChannel(doc_chan)
-}
-
-func worker(done chan bool) {
-    fmt.Print("working...")
-	time.Sleep(5 * time.Second)
-    fmt.Println("done")
-    done <- true
-}
 
 //func churn(newIndex <-chan float64, newData chan<- datum) {
-func processChannel(doc_chan <-chan string) error {
+go func() {
 
-	fmt.Println("processChannel length ",len(doc_chan))	
+	//<-done // Wait for doc_chan to have data
+	fmt.Println("processChannel length ",len(doc_chan))
 
 	var (
 		index    = flag.String("index", "", "Elasticsearch index name")
@@ -118,13 +97,6 @@ func processChannel(doc_chan <-chan string) error {
 				}
 				// "bulk" is reset after Do, so you can reuse it
 			}
-/*
-			select {
-			default:
-			case <-ctx.Done():
-				return ctx.Err()
-			}
-*/
 		}
 
 		// Commit the final batch before exiting
@@ -136,7 +108,9 @@ func processChannel(doc_chan <-chan string) error {
 		}
 		return nil
 	})
-	return nil
+	done <- true
+}()
+<-done
 }
 
 func getChannel(json []byte) <-chan string {
