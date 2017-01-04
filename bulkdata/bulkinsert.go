@@ -22,7 +22,19 @@ import (
 
 func main() {
 
+	url := "http://127.0.0.1:3000/omdb.json"
+	json := getJson(url)
+	fmt.Println(len(json))
+	doc_chan := getChannel(json)
 
+	// wait until the channel is full before proceeding...
+
+	
+	processChannel(doc_chan)
+}
+
+//func churn(newIndex <-chan float64, newData chan<- datum) {
+func processChannel(doc_chan <-chan string) error {
 	var (
 		index    = flag.String("index", "", "Elasticsearch index name")
 		typ      = flag.String("type", "", "Elasticsearch type name")
@@ -46,6 +58,7 @@ func main() {
 		log.Fatal("bulk-size must be a positive number")
 	}
 
+
 	// Do a trace log
 	tracelog := log.New(os.Stdout, "", 0)
 	client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
@@ -59,22 +72,11 @@ func main() {
 
 
 
-
-	url := "http://127.0.0.1:3000/omdb.json"
-	json := getJson(url)
-	fmt.Println(len(json))
-
 	// Setup a group of goroutines from the excellent errgroup package
 	g, ctx := errgroup.WithContext(context.TODO())
 
-
-
-
-
-
-
 	g.Go(func() error {
-		doc_chan := getChannel(json)
+
 		bulk := client.Bulk().Index(*index).Type(*typ)
 		count := 0
 		for d := range doc_chan {
@@ -95,23 +97,25 @@ func main() {
 				}
 				// "bulk" is reset after Do, so you can reuse it
 			}
-
+/*
 			select {
 			default:
 			case <-ctx.Done():
 				return ctx.Err()
 			}
+*/
 		}
 
 		// Commit the final batch before exiting
 		if bulk.NumberOfActions() > 0 {
-			_, err = bulk.Do(ctx)
+			_, err := bulk.Do(ctx)
 			if err != nil {
 				return err
 			}
 		}
 		return nil
 	})
+	return nil
 }
 
 func getChannel(json []byte) <-chan string {
