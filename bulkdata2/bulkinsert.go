@@ -22,10 +22,11 @@ import (
 
 func main() {
 	done := make(chan bool)
+	doc_chan := make(chan string)
 	url := "http://127.0.0.1:3000/omdb.json"
 	json := getJson(url)
 	fmt.Println(len(json))
-	doc_chan := getChannel(json)
+	//doc_chan := getChannel(json)
 	//done <- true
 	fmt.Println("Channel length ",len(doc_chan))
 
@@ -110,11 +111,7 @@ go func() {
 	})
 	done <- true
 }()
-<-done
-}
 
-func getChannel(json []byte) <-chan string {
-	doc_chan := make(chan string)
 	go func() {
 		reader := bytes.NewReader(json)
 		scanner := bufio.NewScanner(reader)
@@ -135,8 +132,10 @@ func getChannel(json []byte) <-chan string {
 		}
 		close(doc_chan)
 	}()
-	return doc_chan
+
+<-done
 }
+
 
 func getJson(url string) (buf []byte) {
 	var netClient = &http.Client{
