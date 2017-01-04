@@ -26,15 +26,6 @@ func main() {
 	url := "http://127.0.0.1:3000/omdb.json"
 	json := getJson(url)
 	fmt.Println(len(json))
-	//doc_chan := getChannel(json)
-	//done <- true
-	fmt.Println("Channel length ",len(doc_chan))
-
-//func churn(newIndex <-chan float64, newData chan<- datum) {
-go func() {
-
-	//<-done // Wait for doc_chan to have data
-	fmt.Println("processChannel length ",len(doc_chan))
 
 	var (
 		index    = flag.String("index", "", "Elasticsearch index name")
@@ -59,7 +50,6 @@ go func() {
 		log.Fatal("bulk-size must be a positive number")
 	}
 
-
 	// Do a trace log
 	tracelog := log.New(os.Stdout, "", 0)
 	client, err := elastic.NewClient(elastic.SetTraceLog(tracelog))
@@ -71,8 +61,6 @@ go func() {
 		log.Fatal(err)
 	}
 
-
-
 	// Setup a group of goroutines from the excellent errgroup package
 	g, ctx := errgroup.WithContext(context.TODO())
 
@@ -80,6 +68,7 @@ go func() {
 
 		bulk := client.Bulk().Index(*index).Type(*typ)
 		count := 0
+		fmt.Println("Hanging here...")
 		for d := range doc_chan {
 			fmt.Println(count, " ", d)
 			// Enqueue the document
@@ -110,7 +99,6 @@ go func() {
 		return nil
 	})
 	done <- true
-}()
 
 	go func() {
 		reader := bytes.NewReader(json)
