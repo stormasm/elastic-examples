@@ -27,14 +27,35 @@ func main() {
 	fmt.Println(len(json))
 	doc_chan := getChannel(json)
 
+	fmt.Println("Channel length ",len(doc_chan))
+/*
+	count := 0
+	for d := range doc_chan {
+		fmt.Println(count, " ", d)
+		count = count + 1
+	}
+*/
 	// wait until the channel is full before proceeding...
 
-	
+	done := make(chan bool, 1)
+	go worker(done)
+	<-done
+	fmt.Println("Channel length ",len(doc_chan))
 	processChannel(doc_chan)
+}
+
+func worker(done chan bool) {
+    fmt.Print("working...")
+	time.Sleep(5 * time.Second)
+    fmt.Println("done")
+    done <- true
 }
 
 //func churn(newIndex <-chan float64, newData chan<- datum) {
 func processChannel(doc_chan <-chan string) error {
+
+	fmt.Println("processChannel length ",len(doc_chan))	
+
 	var (
 		index    = flag.String("index", "", "Elasticsearch index name")
 		typ      = flag.String("type", "", "Elasticsearch type name")
