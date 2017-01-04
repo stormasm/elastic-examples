@@ -21,7 +21,6 @@ import (
 )
 
 func main() {
-	done := make(chan bool)
 	doc_chan := make(chan string)
 	url := "http://127.0.0.1:3000/omdb.json"
 	json := getJson(url)
@@ -98,9 +97,8 @@ func main() {
 		}
 		return nil
 	})
-	done <- true
 
-	go func() {
+	g.Go(func() error {
 		reader := bytes.NewReader(json)
 		scanner := bufio.NewScanner(reader)
 		count := 0
@@ -119,9 +117,14 @@ func main() {
 			fmt.Fprintln(os.Stderr, "reading standard input:", err)
 		}
 		close(doc_chan)
-	}()
+		return nil
+	})
 
-<-done
+	// Wait until all goroutines are finished
+	if err := g.Wait(); err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 
