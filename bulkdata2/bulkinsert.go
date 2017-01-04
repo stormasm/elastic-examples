@@ -15,9 +15,9 @@ import (
 	"math/rand"
 	"strconv"
 
+	"github.com/stormasm/elastic"
 	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
-	"github.com/stormasm/elastic"
 )
 
 func main() {
@@ -126,7 +126,6 @@ func main() {
 	}
 
 }
-
 
 func getJson(url string) (buf []byte) {
 	var netClient = &http.Client{
