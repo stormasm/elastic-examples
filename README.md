@@ -1,4 +1,4 @@
-# go-elastic
+# elastic-examples
 
 ```
 cd src/github.com/stormasm
