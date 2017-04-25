@@ -24,6 +24,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
 	//"fmt"
@@ -34,9 +35,8 @@ import (
 	//"sync/atomic"
 	"time"
 
-	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
-	"gopkg.in/olivere/elastic.v5"
+	"github.com/olivere/elastic"
 )
 
 func main() {
