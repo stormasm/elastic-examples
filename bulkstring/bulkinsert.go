@@ -20,23 +20,22 @@
 // committing every set of 1.000 documents.
 //
 //     bulk_insert -index=warehouse -type=product -n=100000 -bulk-size=1000
+//     bulkstring -index=warehouse -type=product -n=100 -bulk-size=10
 //
 package main
 
 import (
+	"context"
 	"errors"
 	"flag"
-	//"fmt"
 	"log"
 	"math/rand"
 	"os"
 	"strconv"
-	//"sync/atomic"
 	"time"
 
-	"golang.org/x/net/context"
 	"golang.org/x/sync/errgroup"
-	"github.com/stormasm/elastic"
+	"github.com/olivere/elastic"
 )
 
 func main() {
