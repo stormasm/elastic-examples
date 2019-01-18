@@ -8,3 +8,5 @@ go get golang.org/x/sync/errgroup
 go install
 bulkstring -index=warehouse -type=product -n=100 -bulk-size=10
 ```
+
+ok
