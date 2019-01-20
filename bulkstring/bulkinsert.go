@@ -35,7 +35,7 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
-	"github.com/olivere/elastic"
+	"github.com/stormasm/elastic02"
 )
 
 func main() {
