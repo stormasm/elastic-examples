@@ -1,5 +1,13 @@
 # elastic-examples
 
+### NOTE
+
+This repo has no association with Redis or pulling
+data out of Redis...
+
+If you want examples combining Redis and Elastic see
+[ElasticHacker](https://github.com/stormasm/elastichacker)
+
 ```
 go build -o bulkinsert bulkinsert.go
 ./bulkinsert -index raton -type peter -n 100 -bulk-size 10
